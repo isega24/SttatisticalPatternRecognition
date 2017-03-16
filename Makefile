@@ -1,5 +1,5 @@
 CC=clang++-3.8
-CFLAGS=-c -Wall -std=c++11
+CFLAGS=-c -Wall -std=c++11 -g
 LDFLAGS=
 BIN=./bin
 SRC=./src
@@ -9,8 +9,8 @@ TXT=./txt
 vpath %.cpp src
 vpath %.h include
 
-all:
-	mkdir $(BIN) $(RES) $(TXT) $(SRC) $(OBJ)
+all:program1
+
 
 git:
 	git add -A
