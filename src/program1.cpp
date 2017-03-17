@@ -9,8 +9,6 @@ using namespace std;
 // Assume that possition 0 is empty.
 vector< vector < vector< double > > > dataClasses;
 
-
-
 // Calcula la suma termino a termino de dos vectores. Operacion multidimensional.
 vector < double > operator +(const vector<double> &p1,const vector<double> &p2){
     vector<double> result(dataClasses[0][0].size());
@@ -239,7 +237,10 @@ int main(int argc, char const *argv[]) {
     trF.close();
 
     Classifier cl(dataClasses);
-    cout << "Este elemento es de la clase: " << 1+ cl.clasifie(caso) << endl;
+    vector< double > caso;
+
+    for(int i = 0; i < 10; i++) caso.push_back(0);
+    cout << "This element  " << 1+ cl.clasifie(caso) << endl;
 
     // Time to Train.
 
