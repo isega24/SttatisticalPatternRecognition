@@ -1,5 +1,5 @@
 CC=clang++-3.8
-CFLAGS=-c -Wall -std=c++11 -g
+CFLAGS=-c -Wall -std=c++11 -g -Iinclude
 LDFLAGS=
 BIN=./bin
 SRC=./src
@@ -16,8 +16,6 @@ git:
 	git add -A
 	git commit -m "Modifiations to the program."
 	git push -u origin master
-
-
 
 program1: $(OBJ)/program1.o
 	$(CC) $(LDFLAGS) -o $(BIN)/$@ $^
