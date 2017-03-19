@@ -17,7 +17,7 @@ git:
 	git commit -m "Modifiations to the program."
 	git push -u origin master
 
-program1: $(OBJ)/program1.o
+program1: $(OBJ)/program1.o 
 	$(CC) $(LDFLAGS) -o $(BIN)/$@ $^
 
 $(OBJ)/%.o : $(SRC)/%.cpp

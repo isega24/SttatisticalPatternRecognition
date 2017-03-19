@@ -58,8 +58,7 @@ private:
 
     // Funcion para crear la funcion discriminante con los valores ya calculados.
     void normalizeDiscriminant(int clas);
-    // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
-    double discriminant (vector < double > cases , int clas);
+
 
 public:
 
@@ -67,7 +66,10 @@ public:
     Classifier(vector < vector < vector <double> > > & data);
     void showGravityCenter(int clas);
     void showGravityCenterStandard(int clas);
+    void showWeightsStandard(int clas);
     int clasifie(vector < double > cases);
+    // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
+    double discriminant (vector < double > cases , int clas);
 
 };
 
@@ -191,8 +193,9 @@ vector < double > Classifier::desviationValue(){
         }
     }
     secondMoment = secondMoment/(1.0*values);
-    vector < double > meane = this->meanValue();
-    vector<double> desviation = secondMoment - meane*meane;
+    vector < double > meane = this->meanValue()*this->meanValue();
+
+    vector<double> desviation = secondMoment - meane;
     for(int i = 0; i < desviation.size(); i++){
         if(desviation[i] < 0){
             desviation[i] = 0;
@@ -206,8 +209,10 @@ vector < double > Classifier::desviationValue(){
 
 // Funcion para crear la funcion discriminante con los valores ya calculados.
 void Classifier::normalizeDiscriminant(int clas){
-    this->omegaValues[clas] = normalizeClassesGravityPoints[clas]/desviationValue();
-    this->omegaValue[clas] = -2*scalarProduct(normalizeClassesGravityPoints[clas],meanValue()/desviationValue())-
+    vector < double > desv = this->desviationValue();
+    vector < double > mean = this->meanValue();
+    this->omegaValues[clas] = 2*normalizeClassesGravityPoints[clas]/desv;
+    this->omegaValue[clas] = -2*scalarProduct(normalizeClassesGravityPoints[clas],mean/desv)-
         scalarProduct(normalizeClassesGravityPoints[clas],normalizeClassesGravityPoints[clas]);
 }
 // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
@@ -231,6 +236,7 @@ Classifier::Classifier(vector < vector < vector <double> > > & data){
         this->normalizeClassesGravityPoints[i] = vector< double >(this->data[0][0]);
     }
     this->normalizeData();
+    for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
 
 }
 void Classifier::showGravityCenter(int clas){
@@ -246,10 +252,11 @@ void Classifier::showGravityCenterStandard(int clas){
     cout << endl;
 }
 int Classifier::clasifie(vector < double > cases){
-    int max = 1;
-    double maxValue = discriminant(cases,1);
+    int max = 0;
+    double maxValue = discriminant(cases,0);
     double value = maxValue;
     for(int i = 1; i < data.size(); i++){
+        value = discriminant(cases,i);
         if(maxValue < value){
             max = i;
             maxValue = value;
@@ -272,4 +279,14 @@ int showData(int clas, vector< vector < vector< double > > > & data){
     }
     return 0;
 }
+void Classifier::showWeightsStandard(int clas){
+    for(int i = 0; i < this->omegaValues[clas].size(); i++){
+        cout << this->omegaValues[clas][i] << " ";
+    }
+    cout << endl;
+}
+
+
+
+
 #endif
