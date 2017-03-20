@@ -7,7 +7,7 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-    if(argc < 1){
+    if(argc < 2){
         cout << "It needs at least the Train set"<<endl;
         exit(-1);
     }
@@ -54,10 +54,10 @@ int main(int argc, char const *argv[]) {
         cl.showGravityCenterStandard(i);
     }
     cout << "\n\nStandard weights: "<<endl;
-    for( int i = 0; i < dataClasses.size(); i++){
+    for( int i = 0; i < classes; i++){
         cl.showWeightsStandard(i);
     }
-    if(argc < 2){
+    if(argc < 3){
         cout << "There is not a Testing set"<<endl;
         exit(-1);
     }
@@ -88,14 +88,28 @@ int main(int argc, char const *argv[]) {
     cout << "Results of test:"<<endl;
     cout << "Obj nr:    True Class      assigned Class"<<endl;
     int fails = 0;
+    vector < vector < double > > PMatrix(classes);
+    for( int i = 0; i < classes; i++){
+        PMatrix[i] = vector<double>(classes);
+    }
+
     for(int i = 0; i < trainSet.size(); i++){
         int clasified = cl.clasifie(vector<double>(++trainSet[i].begin(), trainSet[i].end()));
         cout << i+1 << "\t\t" << trainSet[i][0] << "\t\t"<< clasified <<endl;
+        PMatrix[trainSet[i][0]-1][clasified-1]++;
         if(clasified != trainSet[i][0]){
             fails++;
         }
     }
     cout << "Error rate = " << 100*fails*1.0/trainSet.size() <<"%"<<endl;
+
+    cout << "PMatrix"<<endl;
+    for( int i = 0; i < classes ; i++){
+        for(int j = 0; j < classes; j++){
+            cout << PMatrix[i][j] << "\t";
+        }
+        cout << endl;
+    }
 
 
 
