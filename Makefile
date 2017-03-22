@@ -1,8 +1,8 @@
 CC=clang++-3.8
-CFLAGS=-c -Wall -std=c++11 -g -Iinclude
+CFLAGS=-Wall -std=c++11 -g -Iinclude
 LDFLAGS=
 BIN=./bin
-SRC=./src
+SRC=./src/program1.cpp
 OBJ=./obj
 RES=./results
 TXT=./txt
@@ -17,11 +17,9 @@ git:
 	git commit -m "Modifiations to the program."
 	git push -u origin master
 
-program1: $(OBJ)/program1.o 
-	$(CC) $(LDFLAGS) -o $(BIN)/$@ $^
 
-$(OBJ)/%.o : $(SRC)/%.cpp
-	$(CC) $(CFLAGS) -o $@ $<
+program1: $(SRC)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BIN)/$@ $^
 
 clean:
 	rm $(BIN)/* $(OBJ)/* $(RES)/*

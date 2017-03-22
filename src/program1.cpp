@@ -22,14 +22,12 @@ int main(int argc, char const *argv[]) {
     int classes, features, cases;
     trF >> classes >> features >> cases;
 
-    cout << "\nNumber of classes: " << classes << "\nNumber of features: "<< features << "\nNumber of cases: "<<cases << endl;
+    dataClasses = vector < vector < vector < float > > >(classes);
 
-    dataClasses = vector < vector < vector < double > > >(classes);
-
-    double input ;
+    float input ;
     int clas;
     for( int i = 0; i < cases; i++){
-        vector<double> v;
+        vector<float> v;
         trF >> clas;
 
         for(int j = 0; j < features; j++){
@@ -53,6 +51,11 @@ int main(int argc, char const *argv[]) {
     for(int i = 0; i < classes; i++){
         cl.showGravityCenterStandard(i);
     }
+    cout << "\n\nWeights: "<<endl;
+    for( int i = 0; i < classes; i++){
+        cl.showWeights(i);
+    }
+
     cout << "\n\nStandard weights: "<<endl;
     for( int i = 0; i < classes; i++){
         cl.showWeightsStandard(i);
@@ -70,10 +73,10 @@ int main(int argc, char const *argv[]) {
     }
     testF    >> classes >> features >> cases;
 
-    vector < vector < double > > trainSet;
+    vector < vector < float > > trainSet;
 
     for( int i = 0; i < cases; i++){
-        vector<double> v;
+        vector<float> v;
 
         for(int j = 0; j <= features; j++){
             testF    >> input;
@@ -88,29 +91,57 @@ int main(int argc, char const *argv[]) {
     cout << "Results of test:"<<endl;
     cout << "Obj nr:    True Class      assigned Class"<<endl;
     int fails = 0;
-    vector < vector < double > > PMatrix(classes);
+    vector < vector < float > > PMatrix(classes), QMatrix(classes), RMatrix(classes);
     for( int i = 0; i < classes; i++){
-        PMatrix[i] = vector<double>(classes);
+        PMatrix[i] = vector<float>(classes);
+        QMatrix[i] = vector<float>(classes);
+        RMatrix[i] = vector<float>(classes);
     }
 
     for(int i = 0; i < trainSet.size(); i++){
-        int clasified = cl.clasifie(vector<double>(++trainSet[i].begin(), trainSet[i].end()));
+        int clasified = cl.clasifie(vector<float>(++trainSet[i].begin(), trainSet[i].end()));
         cout << i+1 << "\t\t" << trainSet[i][0] << "\t\t"<< clasified <<endl;
-        PMatrix[trainSet[i][0]-1][clasified-1]++;
+        RMatrix[trainSet[i][0]-1][clasified-1]++;
         if(clasified != trainSet[i][0]){
             fails++;
         }
     }
     cout << "Error rate = " << 100*fails*1.0/trainSet.size() <<"%"<<endl;
 
-    cout << "PMatrix"<<endl;
+    cout << "RMatrix"<<endl;
+    for( int i = 0; i < classes ; i++){
+        for(int j = 0; j < classes; j++){
+            cout << RMatrix[i][j] << "\t";
+        }
+        cout << endl;
+    }
+
+    for(int i = 0; i < PMatrix.size(); i++){
+        int sumP = 0, sumQ = 0;
+        for( int j = 0; j < PMatrix.size(); j++){
+            sumP += RMatrix[i][j];
+            sumQ += RMatrix[j][i];
+        }
+        for( int j = 0; j < PMatrix.size(); j++){
+            PMatrix[i][j] = RMatrix[i][j]*1.0/sumP;
+            QMatrix[j][i] = RMatrix[j][i]*1.0/sumQ;
+
+        }
+    }
+    cout << "\nPMatrix"<<endl;
     for( int i = 0; i < classes ; i++){
         for(int j = 0; j < classes; j++){
             cout << PMatrix[i][j] << "\t";
         }
         cout << endl;
     }
-
+    cout << "\nQMatrix"<<endl;
+    for( int i = 0; i < classes ; i++){
+        for(int j = 0; j < classes; j++){
+            cout << QMatrix[i][j] << "\t";
+        }
+        cout << endl;
+    }
 
 
 
