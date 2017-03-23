@@ -43,23 +43,6 @@ int main(int argc, char const *argv[]) {
 
     Classifier cl(dataClasses);
 
-    cout << "Gravity points of the classes without Standarization:"<< endl;
-    for(int i = 0; i < classes; i++){
-        cl.showGravityCenter(i);
-    }
-    cout << "\n\nGravity points with standarization:"<< endl <<endl;
-    for(int i = 0; i < classes; i++){
-        cl.showGravityCenterStandard(i);
-    }
-    cout << "\n\nWeights: "<<endl;
-    for( int i = 0; i < classes; i++){
-        cl.showWeights(i);
-    }
-
-    cout << "\n\nStandard weights: "<<endl;
-    for( int i = 0; i < classes; i++){
-        cl.showWeightsStandard(i);
-    }
     if(argc < 3){
         cout << "There is not a Testing set"<<endl;
         exit(-1);
@@ -71,7 +54,7 @@ int main(int argc, char const *argv[]) {
         cerr << "\nCan't open file " << FileName << endl;
         exit( -1 );
     }
-    testF    >> classes >> features >> cases;
+    testF >> classes >> features >> cases;
 
     vector < vector < double > > trainSet;
 
@@ -99,7 +82,7 @@ int main(int argc, char const *argv[]) {
     }
 
     for(int i = 0; i < trainSet.size(); i++){
-        int clasified = cl.clasifie(vector<double>(++trainSet[i].begin(), trainSet[i].end()));
+        int clasified = cl.clasifieKNN(1,vector<double>(++trainSet[i].begin(), trainSet[i].end()));
         cout << i+1 << "\t\t" << trainSet[i][0] << "\t\t"<< clasified <<endl;
         RMatrix[trainSet[i][0]-1][clasified-1]++;
         if(clasified != trainSet[i][0]){

@@ -3,82 +3,90 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 #ifndef CLASSIFIER
 #define CLASSIFIER
 using namespace std;
 
 // Assume that possition 0 is empty.
-vector< vector < vector< float > > > dataClasses;
+vector< vector < vector< double > > > dataClasses;
 
-int showData(int clas, vector< vector < vector< float > > > & data);
+int showData(int clas, vector< vector < vector< double > > > & data);
 
 // Calcula la suma termino a termino de dos vectores. Operacion multidimensional.
-vector < float > operator +(const vector<float> &p1,const vector<float> &p2);
+vector < double > operator +(const vector<double> &p1,const vector<double> &p2);
 
 // Calcula la diferencia de dos vectores termino a termino. Operacion multidimensional.
-vector < float > operator -(const vector<float> &p1,const vector<float> &p2);
+vector < double > operator -(const vector<double> &p1,const vector<double> &p2);
 
 //Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
-vector < float > operator *(const vector<float> &p1,const vector<float> &p2);
+vector < double > operator *(const vector<double> &p1,const vector<double> &p2);
 //Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
-vector < float > operator *(const float &p1,const vector<float> &p2);
+vector < double > operator *(const double &p1,const vector<double> &p2);
 //Calcula la division termino a termino de los terminos del primer vector entre los del
 // segundo. Operacion multidimensional.
-vector < float > operator /(const vector<float> &p1,const vector<float> &p2);
+vector < double > operator /(const vector<double> &p1,const vector<double> &p2);
 
-vector < float > operator /(const vector<float> &p1,const float &p2);
+vector < double > operator /(const vector<double> &p1,const double &p2);
 
 // Calcula el resultado de dividir un vector entre una constante. Operacion multidimensional.
-vector < float > norma(const vector<float> &p1,const float &p2);
+vector < double > norma(const vector<double> &p1,const double &p2);
 
 // Calcula la norma de un vector. Salida unidimensional.
-float scalarProduct(const vector<float> &p1,const vector<float> &p2);
+double scalarProduct(const vector<double> &p1,const vector<double> &p2);
+
+double discriminantKNN(const vector < double > & cases, const vector < double > &trainPoint);
 
 class Classifier{
 private:
-    vector < vector < vector <float> > > data;
-    vector < vector < vector <float> > > normalData;
+    vector < vector < vector <double> > > data;
+    vector < vector < vector <double> > > normalData;
 
-    vector < vector < float > > classesGravityPoints;
-    vector < vector < float > > normalizeClassesGravityPoints;
+    vector < vector < double > > classesGravityPoints;
+    vector < vector < double > > normalizeClassesGravityPoints;
 
-    vector< float > omegaValue;
-    vector< vector < float > > omegaValues;
-    vector<float> omegaValueStandard;
-    vector< vector <float> > omegaValuesStandard;
+    vector< double > omegaValue;
+    vector< vector < double > > omegaValues;
+    vector<double> omegaValueStandard;
+    vector< vector <double> > omegaValuesStandard;
 
     // Centro de gravedad de la clase. Se utiliza para clasificar
-    vector < float > gravityPoint(int clas);
+    vector < double > gravityPoint(int clas);
     // Normalizamos los datos y los centros de gravedad. Se utiliza meanValue y desviationValue.
     void normalizeData();
     // La media de cada feature. Se utiliza para normalizar.
-    vector < float > meanValue();
+    vector < double > meanValue();
 
     // La desviacion tipica de cada feature. Se utiliza para normalizar.
-    vector < float > desviationValue();
+    vector < double > desviationValue();
 
     // Funcion para crear la funcion discriminante con los valores ya calculados.
     void normalizeDiscriminant(int clas);
 
 
+
 public:
 
     // Constructor de clase. Inicializa los clasificadores y los estandariza.
-    Classifier(vector < vector < vector <float> > > & data);
+    Classifier(vector < vector < vector <double> > > & data);
     void showGravityCenter(int clas);
     void showGravityCenterStandard(int clas);
     void showWeights(int clas);
     void showWeightsStandard(int clas);
-    int clasifie(vector < float > cases);
+    int clasifie(vector < double > cases);
     // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
-    float discriminant (vector < float > cases , int clas);
+    double discriminant (vector < double > cases , int clas);
+
+    int clasifieKNN(int k, const vector<double> cases)const;
+
+
 
 };
 
 
-vector < float > operator +(const vector<float> &p1,const vector<float> &p2){
-    vector<float> result;
+vector < double > operator +(const vector<double> &p1,const vector<double> &p2){
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]+p2[i]);
     }
@@ -87,9 +95,9 @@ vector < float > operator +(const vector<float> &p1,const vector<float> &p2){
 }
 
 // Calcula la diferencia de dos vectores termino a termino. Operacion multidimensional.
-vector < float > operator -(const vector<float> &p1,const vector<float> &p2)
+vector < double > operator -(const vector<double> &p1,const vector<double> &p2)
 {
-    vector<float> result;
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]-p2[i]);
     }
@@ -98,8 +106,8 @@ vector < float > operator -(const vector<float> &p1,const vector<float> &p2)
 }
 
 //Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
-vector < float > operator *(const vector<float> &p1,const vector<float> &p2){
-    vector<float> result;
+vector < double > operator *(const vector<double> &p1,const vector<double> &p2){
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]*p2[i]);
     }
@@ -107,8 +115,8 @@ vector < float > operator *(const vector<float> &p1,const vector<float> &p2){
     return result;
 }
 //Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
-vector < float > operator *(const float &p1,const vector<float> &p2){
-    vector<float> result;
+vector < double > operator *(const double &p1,const vector<double> &p2){
+    vector<double> result;
     for(int i = 0; i < p2.size(); i++){
         result.push_back(p1*p2[i]);
     }
@@ -117,16 +125,16 @@ vector < float > operator *(const float &p1,const vector<float> &p2){
 }
 //Calcula la division termino a termino de los terminos del primer vector entre los del
 // segundo. Operacion multidimensional.
-vector < float > operator /(const vector<float> &p1,const vector<float> &p2){
-    vector<float> result;
+vector < double > operator /(const vector<double> &p1,const vector<double> &p2){
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]/p2[i]);
     }
     return result;
 }
 
-vector < float > operator /(const vector<float> &p1,const float &p2){
-    vector<float> result;
+vector < double > operator /(const vector<double> &p1,const double &p2){
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]/p2);
     }
@@ -135,8 +143,8 @@ vector < float > operator /(const vector<float> &p1,const float &p2){
 }
 
 // Calcula el resultado de dividir un vector entre una constante. Operacion multidimensional.
-vector < float > norma(const vector<float> &p1,const float &p2){
-    vector<float> result;
+vector < double > norma(const vector<double> &p1,const double &p2){
+    vector<double> result;
     for(int i = 0; i < p1.size(); i++){
         result.push_back(p1[i]/p2);
     }
@@ -145,8 +153,8 @@ vector < float > norma(const vector<float> &p1,const float &p2){
 }
 
 // Calcula la norma de un vector. Salida unidimensional.
-float scalarProduct(const vector<float> &p1,const vector<float> &p2){
-    float result = 0;
+double scalarProduct(const vector<double> &p1,const vector<double> &p2){
+    double result = 0;
     for(int i = 0; i < p1.size(); i++){
         result += p1[i]*p2[i];
     }
@@ -154,9 +162,9 @@ float scalarProduct(const vector<float> &p1,const vector<float> &p2){
 }
 
 
-vector < float > Classifier::gravityPoint(int clas){
+vector < double > Classifier::gravityPoint(int clas){
 
-    vector < float > meane = data[clas][0];
+    vector < double > meane = data[clas][0];
     for( int i = 1; i < data[clas].size(); i++){
         meane = meane + data[clas][i];
     }
@@ -165,7 +173,7 @@ vector < float > Classifier::gravityPoint(int clas){
 }
 
 void Classifier::normalizeData(){
-    vector < float > meane = meanValue(), desv = desviationValue();
+    vector < double > meane = meanValue(), desv = desviationValue();
     for( int i = 0; i < data.size(); i++){
         for( int j = 0; j < data[i].size(); j++){
             normalData[i][j] = (data[i][j]-meane)/desv;
@@ -175,8 +183,8 @@ void Classifier::normalizeData(){
         this->omegaValue[i] = -scalarProduct(this->normalizeClassesGravityPoints[i],this->normalizeClassesGravityPoints[i]);
     }
 }
-vector < float > Classifier::meanValue(){
-    vector<float> firstMoment(this->data[0][0].size());
+vector < double > Classifier::meanValue(){
+    vector<double> firstMoment(this->data[0][0].size());
     int values = 0;
     for( int i = 0; i < data.size(); i++){
         values += data[i].size();
@@ -187,8 +195,8 @@ vector < float > Classifier::meanValue(){
     return firstMoment/(1.0*values);
 }
 
-vector < float > Classifier::desviationValue(){
-    vector<float> secondMoment(this->data[0][0].size());
+vector < double > Classifier::desviationValue(){
+    vector<double> secondMoment(this->data[0][0].size());
     int values = 0;
     for( int i = 0; i < data.size(); i++){
         values += data[i].size();
@@ -197,9 +205,9 @@ vector < float > Classifier::desviationValue(){
         }
     }
     secondMoment = secondMoment/(1.0*values);
-    vector < float > meane = this->meanValue()*this->meanValue();
+    vector < double > meane = this->meanValue()*this->meanValue();
 
-    vector<float> desviation = secondMoment - meane;
+    vector<double> desviation = secondMoment - meane;
     for(int i = 0; i < desviation.size(); i++){
         if(desviation[i] < 0){
             desviation[i] = 0;
@@ -213,35 +221,35 @@ vector < float > Classifier::desviationValue(){
 
 // Funcion para crear la funcion discriminante con los valores ya calculados.
 void Classifier::normalizeDiscriminant(int clas){
-    vector < float > desv = this->desviationValue();
-    vector < float > mean = this->meanValue();
+    vector < double > desv = this->desviationValue();
+    vector < double > mean = this->meanValue();
     this->omegaValuesStandard[clas] = 2*normalizeClassesGravityPoints[clas]/desv;
     this->omegaValueStandard[clas] = -2*scalarProduct(normalizeClassesGravityPoints[clas],mean/desv)-
         scalarProduct(normalizeClassesGravityPoints[clas],normalizeClassesGravityPoints[clas]);
 }
 // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
-float Classifier::discriminant (vector < float > cases , int clas){
+double Classifier::discriminant (vector < double > cases , int clas){
     return scalarProduct(omegaValuesStandard[clas],cases)+omegaValueStandard[clas];
 }
 
 
-Classifier::Classifier(vector < vector < vector <float> > > & data){
+Classifier::Classifier(vector < vector < vector <double> > > & data){
     this->data = data;
     this->normalData = this->data;
     for( int i = 0; i < data.size(); i++){
-        vector < float > gPoint = this->gravityPoint(i);
+        vector < double > gPoint = this->gravityPoint(i);
         this->classesGravityPoints.push_back(gPoint);
     }
 
-    this->omegaValue = vector<float>(this->data[0][0].size());
-    this->omegaValues = vector< vector < float > >( this->data[0][0].size());
-    this->omegaValueStandard = vector<float>(this->data[0][0].size());
-    this->omegaValuesStandard = vector< vector < float > >(this->data.size());
-    this->normalizeClassesGravityPoints = vector< vector < float > >(this->data.size());
+    this->omegaValue = vector<double>(this->data[0][0].size());
+    this->omegaValues = vector< vector < double > >( this->data[0][0].size());
+    this->omegaValueStandard = vector<double>(this->data[0][0].size());
+    this->omegaValuesStandard = vector< vector < double > >(this->data.size());
+    this->normalizeClassesGravityPoints = vector< vector < double > >(this->data.size());
     for(int i = 0; i < this->data.size(); i++){
-        this->omegaValues[i] = vector < float >(this->data[0][0].size());
-        this->omegaValuesStandard[i] = vector< float >(this->data[0][0].size());
-        this->normalizeClassesGravityPoints[i] = vector< float >(this->data[0][0]);
+        this->omegaValues[i] = vector < double >(this->data[0][0].size());
+        this->omegaValuesStandard[i] = vector< double >(this->data[0][0].size());
+        this->normalizeClassesGravityPoints[i] = vector< double >(this->data[0][0]);
     }
     this->normalizeData();
     for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
@@ -259,10 +267,10 @@ void Classifier::showGravityCenterStandard(int clas){
     }
     cout << endl;
 }
-int Classifier::clasifie(vector < float > cases){
+int Classifier::clasifie(vector < double > cases){
     int max = 0;
-    float maxValue = discriminant(cases,0);
-    float value = maxValue;
+    double maxValue = discriminant(cases,0);
+    double value = maxValue;
     for(int i = 1; i < data.size(); i++){
         value = discriminant(cases,i);
         if(maxValue < value){
@@ -273,7 +281,7 @@ int Classifier::clasifie(vector < float > cases){
     return max+1;
 }
 
-int showData(int clas, vector< vector < vector< float > > > & data){
+int showData(int clas, vector< vector < vector< double > > > & data){
 
     if( clas > data.size()){
         cout << "There is no clas " << clas + 1 << endl;
@@ -299,6 +307,38 @@ void Classifier::showWeightsStandard(int clas){
         cout << this->omegaValuesStandard[clas][i] << " ";
     }
     cout << endl;
+}
+
+int Classifier::clasifieKNN(int k, const vector<double> cases)const{
+    vector < pair< vector < double >, int > > data;
+    for( int i = 0; i < dataClasses.size(); i++){
+        for(int j = 0; j < dataClasses[i].size(); j++){
+            data.push_back(pair< vector < double >, int>(dataClasses[i][j],i) );
+        }
+    }
+    sort(data.begin(), data.end(),
+        [cases]( pair < vector< double >, int > a, pair < vector<double>, int > b) {
+            return discriminantKNN(cases,a.first) > discriminantKNN(cases,b.first);
+        }
+    );
+    vector < int > selected(dataClasses.size(),0);
+
+    for(int i = 0; i < k; i++){
+        selected[data[i].second]++;
+    }
+    int max = 0;
+    int maxValue = selected[0];
+    for( int i = 1; i < selected.size(); i++){
+        if(selected[i] > maxValue){
+            max = i;
+            maxValue = selected[i];
+        }
+    }
+    return max+1;
+
+}
+double discriminantKNN(const vector < double > & cases, const vector < double > &trainPoint){
+    return 2*scalarProduct(cases,trainPoint) - scalarProduct(trainPoint,trainPoint);
 }
 
 
