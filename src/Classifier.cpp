@@ -52,14 +52,14 @@ private:
     vector< vector <double> > omegaValuesStandard;
 
     // Centro de gravedad de la clase. Se utiliza para clasificar
-    vector < double > gravityPoint(int clas);
+    vector < double > gravityPoint(int clas)const;
     // Normalizamos los datos y los centros de gravedad. Se utiliza meanValue y desviationValue.
     void normalizeData();
     // La media de cada feature. Se utiliza para normalizar.
-    vector < double > meanValue();
+    vector < double > meanValue()const;
 
     // La desviacion tipica de cada feature. Se utiliza para normalizar.
-    vector < double > desviationValue();
+    vector < double > desviationValue()const;
 
     // Funcion para crear la funcion discriminante con los valores ya calculados.
     void normalizeDiscriminant(int clas);
@@ -70,13 +70,13 @@ public:
 
     // Constructor de clase. Inicializa los clasificadores y los estandariza.
     Classifier(vector < vector < vector <double> > > & data);
-    void showGravityCenter(int clas);
-    void showGravityCenterStandard(int clas);
-    void showWeights(int clas);
-    void showWeightsStandard(int clas);
-    int clasifie(vector < double > cases);
+    void showGravityCenter(int clas)const;
+    void showGravityCenterStandard(int clas)const;
+    void showWeights(int clas)const;
+    void showWeightsStandard(int clas)const;
+    int clasifie(vector < double > cases)const;
     // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
-    double discriminant (vector < double > cases , int clas);
+    double discriminant (vector < double > cases , int clas)const;
 
     int clasifieKNN(int k, const vector<double> cases)const;
 
@@ -162,7 +162,7 @@ double scalarProduct(const vector<double> &p1,const vector<double> &p2){
 }
 
 
-vector < double > Classifier::gravityPoint(int clas){
+vector < double > Classifier::gravityPoint(int clas)const{
 
     vector < double > meane = data[clas][0];
     for( int i = 1; i < data[clas].size(); i++){
@@ -183,7 +183,7 @@ void Classifier::normalizeData(){
         this->omegaValue[i] = -scalarProduct(this->normalizeClassesGravityPoints[i],this->normalizeClassesGravityPoints[i]);
     }
 }
-vector < double > Classifier::meanValue(){
+vector < double > Classifier::meanValue()const{
     vector<double> firstMoment(this->data[0][0].size());
     int values = 0;
     for( int i = 0; i < data.size(); i++){
@@ -195,7 +195,7 @@ vector < double > Classifier::meanValue(){
     return firstMoment/(1.0*values);
 }
 
-vector < double > Classifier::desviationValue(){
+vector < double > Classifier::desviationValue()const{
     vector<double> secondMoment(this->data[0][0].size());
     int values = 0;
     for( int i = 0; i < data.size(); i++){
@@ -228,7 +228,7 @@ void Classifier::normalizeDiscriminant(int clas){
         scalarProduct(normalizeClassesGravityPoints[clas],normalizeClassesGravityPoints[clas]);
 }
 // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
-double Classifier::discriminant (vector < double > cases , int clas){
+double Classifier::discriminant (vector < double > cases , int clas)const{
     return scalarProduct(omegaValuesStandard[clas],cases)+omegaValueStandard[clas];
 }
 
@@ -255,19 +255,19 @@ Classifier::Classifier(vector < vector < vector <double> > > & data){
     for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
 
 }
-void Classifier::showGravityCenter(int clas){
+void Classifier::showGravityCenter(int clas)const{
     for(int i = 0; i < dataClasses[0][0].size(); i++){
         cout << classesGravityPoints[clas][i] << " ";
     }
     cout << endl;
 }
-void Classifier::showGravityCenterStandard(int clas){
+void Classifier::showGravityCenterStandard(int clas)const{
     for(int i = 0; i < dataClasses[0][0].size(); i++){
         cout << normalizeClassesGravityPoints[clas][i] << " ";
     }
     cout << endl;
 }
-int Classifier::clasifie(vector < double > cases){
+int Classifier::clasifie(vector < double > cases)const{
     int max = 0;
     double maxValue = discriminant(cases,0);
     double value = maxValue;
@@ -295,14 +295,14 @@ int showData(int clas, vector< vector < vector< double > > > & data){
     }
     return 0;
 }
-void Classifier::showWeights(int clas){
+void Classifier::showWeights(int clas)const{
     for(int i = 0; i < this->omegaValuesStandard[clas].size(); i++){
         cout << this->omegaValues[clas][i] << " ";
     }
     cout << endl;
 }
 
-void Classifier::showWeightsStandard(int clas){
+void Classifier::showWeightsStandard(int clas)const{
     for(int i = 0; i < this->omegaValuesStandard[clas].size(); i++){
         cout << this->omegaValuesStandard[clas][i] << " ";
     }
@@ -310,18 +310,19 @@ void Classifier::showWeightsStandard(int clas){
 }
 
 int Classifier::clasifieKNN(int k, const vector<double> cases)const{
+    vector < double > casesNormalize = (cases - this->meanValue())/this->desviationValue();
     vector < pair< vector < double >, int > > data;
-    for( int i = 0; i < dataClasses.size(); i++){
-        for(int j = 0; j < dataClasses[i].size(); j++){
-            data.push_back(pair< vector < double >, int>(dataClasses[i][j],i) );
+    for( int i = 0; i < normalData.size(); i++){
+        for(int j = 0; j < normalData[i].size(); j++){
+            data.push_back(pair< vector < double >, int>(normalData[i][j],i) );
         }
     }
     sort(data.begin(), data.end(),
-        [cases]( pair < vector< double >, int > a, pair < vector<double>, int > b) {
-            return discriminantKNN(cases,a.first) > discriminantKNN(cases,b.first);
+        [casesNormalize]( pair < vector< double >, int > a, pair < vector<double>, int > b) {
+            return discriminantKNN(casesNormalize,a.first) > discriminantKNN(casesNormalize,b.first);
         }
     );
-    vector < int > selected(dataClasses.size(),0);
+    vector < int > selected(normalData.size(),0);
 
     for(int i = 0; i < k; i++){
         selected[data[i].second]++;
