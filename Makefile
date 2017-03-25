@@ -9,7 +9,7 @@ TXT=./txt
 vpath %.cpp src
 vpath %.h include
 
-all:program1 program2
+all:program1 program2 program3
 
 
 git:
@@ -22,6 +22,9 @@ program1: $(SRC)/program1.cpp
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BIN)/$@ $^
 
 program2: $(SRC)/program2.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BIN)/$@ $^
+
+program3: $(SRC)/program3.cpp
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BIN)/$@ $^
 
 

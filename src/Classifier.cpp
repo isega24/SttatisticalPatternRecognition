@@ -38,6 +38,9 @@ double scalarProduct(const vector<double> &p1,const vector<double> &p2);
 
 double discriminantKNN(const vector < double > & cases, const vector < double > &trainPoint);
 
+
+double distance(vector < double > a, vector < double > b);
+
 class Classifier{
 private:
     vector < vector < vector <double> > > data;
@@ -159,6 +162,13 @@ double scalarProduct(const vector<double> &p1,const vector<double> &p2){
         result += p1[i]*p2[i];
     }
     return result;
+}
+
+double distance(vector < double > a, vector < double > b){
+
+    vector< double > dist = a-b;
+
+    return sqrt(scalarProduct(dist,dist));
 }
 
 
