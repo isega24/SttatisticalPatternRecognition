@@ -4,86 +4,51 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-
 #ifndef CLASSIFIER
 #define CLASSIFIER
 using namespace std;
 
-// Assume that possition 0 is empty.
 vector< vector < vector< double > > > dataClasses;
-
 int showData(int clas, vector< vector < vector< double > > > & data);
-
-// Calcula la suma termino a termino de dos vectores. Operacion multidimensional.
 vector < double > operator +(const vector<double> &p1,const vector<double> &p2);
-
-// Calcula la diferencia de dos vectores termino a termino. Operacion multidimensional.
 vector < double > operator -(const vector<double> &p1,const vector<double> &p2);
-
-//Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
 vector < double > operator *(const vector<double> &p1,const vector<double> &p2);
-//Calcula la multiplicacion termino a termino de dos vectores. Operacion multidimensional.
 vector < double > operator *(const double &p1,const vector<double> &p2);
-//Calcula la division termino a termino de los terminos del primer vector entre los del
-// segundo. Operacion multidimensional.
 vector < double > operator /(const vector<double> &p1,const vector<double> &p2);
-
 vector < double > operator /(const vector<double> &p1,const double &p2);
-
-// Calcula el resultado de dividir un vector entre una constante. Operacion multidimensional.
 vector < double > norma(const vector<double> &p1,const double &p2);
-
-// Calcula la norma de un vector. Salida unidimensional.
 double scalarProduct(const vector<double> &p1,const vector<double> &p2);
-
 double discriminantKNN(const vector < double > & cases, const vector < double > &trainPoint);
-
-
 double distance(vector < double > a, vector < double > b);
-
 class Classifier{
 private:
     vector < vector < vector <double> > > data;
     vector < vector < vector <double> > > normalData;
-
     vector < vector < double > > classesGravityPoints;
     vector < vector < double > > normalizeClassesGravityPoints;
-
     vector< double > omegaValue;
     vector< vector < double > > omegaValues;
     vector<double> omegaValueStandard;
     vector< vector <double> > omegaValuesStandard;
-
-    // Centro de gravedad de la clase. Se utiliza para clasificar
+    vector < double > maxMinValues;
     vector < double > gravityPoint(int clas)const;
-    // Normalizamos los datos y los centros de gravedad. Se utiliza meanValue y desviationValue.
     void normalizeData();
-    // La media de cada feature. Se utiliza para normalizar.
     vector < double > meanValue()const;
-
-    // La desviacion tipica de cada feature. Se utiliza para normalizar.
     vector < double > desviationValue()const;
-
-    // Funcion para crear la funcion discriminante con los valores ya calculados.
     void normalizeDiscriminant(int clas);
-
-
-
+    double minDistToSameClassObject(int idObject, int idClass);
+    void setMaxMinDist();
 public:
 
-    // Constructor de clase. Inicializa los clasificadores y los estandariza.
     Classifier(vector < vector < vector <double> > > & data);
     void showGravityCenter(int clas)const;
     void showGravityCenterStandard(int clas)const;
     void showWeights(int clas)const;
     void showWeightsStandard(int clas)const;
     int clasifie(vector < double > cases)const;
-    // Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
     double discriminant (vector < double > cases , int clas)const;
-
     int clasifieKNN(int k, const vector<double> cases)const;
-
-
+    double overlapRateCalculation()const;
 
 };
 
@@ -97,7 +62,6 @@ vector < double > operator +(const vector<double> &p1,const vector<double> &p2){
     return result;
 }
 
-// Calcula la diferencia de dos vectores termino a termino. Operacion multidimensional.
 vector < double > operator -(const vector<double> &p1,const vector<double> &p2)
 {
     vector<double> result;
@@ -127,7 +91,6 @@ vector < double > operator *(const double &p1,const vector<double> &p2){
     return result;
 }
 //Calcula la division termino a termino de los terminos del primer vector entre los del
-// segundo. Operacion multidimensional.
 vector < double > operator /(const vector<double> &p1,const vector<double> &p2){
     vector<double> result;
     for(int i = 0; i < p1.size(); i++){
@@ -145,7 +108,6 @@ vector < double > operator /(const vector<double> &p1,const double &p2){
     return result;
 }
 
-// Calcula el resultado de dividir un vector entre una constante. Operacion multidimensional.
 vector < double > norma(const vector<double> &p1,const double &p2){
     vector<double> result;
     for(int i = 0; i < p1.size(); i++){
@@ -155,7 +117,6 @@ vector < double > norma(const vector<double> &p1,const double &p2){
     return result;
 }
 
-// Calcula la norma de un vector. Salida unidimensional.
 double scalarProduct(const vector<double> &p1,const vector<double> &p2){
     double result = 0;
     for(int i = 0; i < p1.size(); i++){
@@ -229,7 +190,6 @@ vector < double > Classifier::desviationValue()const{
     return desviation;
 }
 
-// Funcion para crear la funcion discriminante con los valores ya calculados.
 void Classifier::normalizeDiscriminant(int clas){
     vector < double > desv = this->desviationValue();
     vector < double > mean = this->meanValue();
@@ -237,7 +197,6 @@ void Classifier::normalizeDiscriminant(int clas){
     this->omegaValueStandard[clas] = -2*scalarProduct(normalizeClassesGravityPoints[clas],mean/desv)-
         scalarProduct(normalizeClassesGravityPoints[clas],normalizeClassesGravityPoints[clas]);
 }
-// Funcion discriminante. La clase que maximice esta funcion, es la mas cercana.
 double Classifier::discriminant (vector < double > cases , int clas)const{
     return scalarProduct(omegaValuesStandard[clas],cases)+omegaValueStandard[clas];
 }
@@ -263,6 +222,7 @@ Classifier::Classifier(vector < vector < vector <double> > > & data){
     }
     this->normalizeData();
     for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
+    this->setMaxMinDist();
 
 }
 void Classifier::showGravityCenter(int clas)const{
@@ -352,6 +312,72 @@ double discriminantKNN(const vector < double > & cases, const vector < double > 
     return 2*scalarProduct(cases,trainPoint) - scalarProduct(trainPoint,trainPoint);
 }
 
+double Classifier::minDistToSameClassObject(int idObject,int idClass){
+    double maxDist = distance(normalData[idClass][idObject], normalData[idClass][(idObject+1)%normalData[idClass].size()]);
+    double dist;
+    for( int i = 0; i < normalData[idClass].size(); i++){
+        dist = distance(normalData[idClass][idObject],normalData[idClass][i]);
+        if( dist >= maxDist and idObject != i){
+            maxDist = dist;
+        }
+    }
+    return maxDist;
+}
+void Classifier::setMaxMinDist(){
+    this->maxMinValues = vector < double >(this->normalData.size(),0);
+    for( int idClass = 0; idClass < this->normalData.size(); idClass++){
+        double dist;
+        for(int idObject = 0; idObject < this->normalData[idClass].size();idObject++){
+            dist = this->minDistToSameClassObject(idObject,idClass);
+            if(dist > this->maxMinValues[idClass]){
+                this->maxMinValues[idClass] = dist;
+            }
+        }
+    }
+}
+double Classifier::overlapRateCalculation()const{
+    cout << "Object   class   ";
+    for(int i = 0; i < this->normalData.size(); i++){
+        cout << "A"<<i+1<< "  ";
+    }
+    cout << endl;
+
+    vector < bool > overlaped;
+    int overlapRate = 0;
+    int object = 1;
+    for(int i = 0; i < this->normalData.size(); i++){
+        for(int j = 0; j < this->normalData[i].size(); j++){
+            overlaped = vector < bool > (normalData.size(),false);
+            for(int clas = 0; clas < this->normalData.size();clas++){
+                for(int idObject = 0; idObject < this->normalData[clas].size() and not overlaped[clas];idObject++){
+                    if( distance(normalData[i][j], normalData[clas][idObject]) < this->maxMinValues[clas] or
+                        i == clas){
+                        overlaped[clas] = true;
+                    }
+                }
+            }
+            cout << "  " << object <<"  "<< i+1 << "\t\t";
+            int count = 0;
+            for(int k = 0; k < normalData.size(); k++){
+                if(overlaped[k]){
+                    cout << "1 ";
+                    count++;
+                    if(count == 2){
+                        overlapRate++;
+                    }
+                }
+                else{
+                    cout << "0 ";
+                }
+            }
+            cout << endl;
+            object++;
+
+        }
+    }
+    cout << "Overlaping Rate: "<< overlapRate*1.0/(object-1) <<endl;
+    return overlapRate*1.0/(object-1);
+}
 
 
 
