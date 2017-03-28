@@ -1,0 +1,4 @@
+Set size after 1 iterations: 33
+Set size after 2 iterations: 44
+Set size after 3 iterations: 45
+Set size after 4 iterations: 45

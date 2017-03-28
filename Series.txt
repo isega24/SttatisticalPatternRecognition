@@ -1,8 +1,8 @@
  File to be reduced: Train.txt
 
- nz,lre = 37  1
- nz,lre = 53  2
- nz,lre = 58  3
- nz,lre = 58  4
- nz = 58
+ nz,lre = 33  1
+ nz,lre = 44  2
+ nz,lre = 45  3
+ nz,lre = 45  4
+ nz = 45
 

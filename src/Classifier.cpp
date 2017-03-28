@@ -38,8 +38,9 @@ private:
     void normalizeDiscriminant(int clas);
     double minDistToSameClassObject(int idObject, int idClass);
     void setMaxMinDist();
-public:
+    pair< vector < double >, int > minDistFromSet(pair < vector < double >, int> element,vector < pair < vector < double >, int> > SET);
 
+public:
     Classifier(vector < vector < vector <double> > > & data);
     void showGravityCenter(int clas)const;
     void showGravityCenterStandard(int clas)const;
@@ -49,7 +50,7 @@ public:
     double discriminant (vector < double > cases , int clas)const;
     int clasifieKNN(int k, const vector<double> cases)const;
     double overlapRateCalculation()const;
-
+    vector < pair < vector < double >, int > >reduceHart(const char * v);
 };
 
 
@@ -379,6 +380,60 @@ double Classifier::overlapRateCalculation()const{
     return overlapRate*1.0/(object-1);
 }
 
+pair< vector < double >, int > Classifier::minDistFromSet(pair < vector < double >, int> element,vector < pair < vector < double >, int> > SET){
+    int id = 0;
+    double minDistance = distance(element.first,SET[0].first);
+    double dist;
+    for(int i = 0; i < SET.size(); i++){
+        dist = distance(element.first, SET[i].first);
+        if(dist < minDistance){
+            minDistance = dist;
+            id = i;
+        }
+    }
+    return SET[id];
+}
+
+vector < pair < vector < double >, int > > Classifier::reduceHart(const char * v){
+    vector < pair< vector < double >, int > > orderedData;
+    for( int i = 0; i < normalData.size(); i++){
+        for(int j = 0; j < normalData[i].size(); j++){
+            orderedData.push_back(pair< vector < double >, int>(normalData[i][j],i) );
+        }
+    }
+    vector < double > zero(orderedData[0].first.size(),0);
+    sort(orderedData.begin(), orderedData.end(),
+        [zero]( pair < vector< double >, int > a, pair < vector<double>, int > b) {
+            return distance(zero,a.first) < distance(zero,b.first);
+        }
+    );
+
+    vector < pair < vector < double >, int> > SET;
+    SET.push_back(orderedData[0]);
+
+    bool adding = true;
+    int iterations = 1;
+
+    ofstream out(v);
+
+    while( adding){
+        adding = false;
+        vector < pair < vector < double >, int> >::iterator iter;
+
+        for( iter = orderedData.begin(); iter != orderedData.end(); ++iter){
+            pair < vector < double >, int > p = this->minDistFromSet(*iter,SET);
+            if(p.second != (*iter).second){
+                SET.push_back(*iter);
+                orderedData.erase(iter);
+                adding = true;
+            }
+        }
+        out << "Set size after "<< iterations <<" iterations: " << SET.size()<< endl;
+        iterations++;
+
+    }
+    return SET;
+}
 
 
 #endif
