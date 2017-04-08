@@ -1,0 +1,15 @@
+Set size after 1 iterations: 539
+Set size after 2 iterations: 538
+Set size after 3 iterations: 537
+Set size after 4 iterations: 536
+Set size after 5 iterations: 535
+Set size after 6 iterations: 534
+Set size after 7 iterations: 533
+Set size after 8 iterations: 532
+Set size after 9 iterations: 531
+Set size after 10 iterations: 530
+Set size after 11 iterations: 529
+Set size after 12 iterations: 528
+Set size after 13 iterations: 527
+Set size after 14 iterations: 526
+Set size after 15 iterations: 526
