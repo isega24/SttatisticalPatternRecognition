@@ -4,8 +4,6 @@ LDFLAGS=
 BIN=./bin
 SRC=./src
 OBJ=./obj
-RES=./results
-TXT=./txt
 vpath %.cpp src
 vpath %.h include
 

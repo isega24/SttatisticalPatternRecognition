@@ -1,0 +1,21 @@
+
+  for k:=1 to nc do {k=class index}
+    begin
+      e[k]:=-10e10;
+      for i1:=1 to m do  {m=training set numerical force}
+        if lv[i1]=k then {lv[i1]=class the object i1 belongs to}
+          begin
+            dmin:=10e10;
+            for i2:=1 to m do
+              if (i1<>i2) and (lv[i2]=k) then
+                begin
+                  a:=0.0; for j:=1 to n do a:=a+sqr(x[i1,j]-x[i2,j]); 
+                  a:=sqrt(a); if a<dmin then dmin:=a
+                 end;
+             if dmin>e[k] then e[k]:=dmin
+          end
+    end;{Areas membership criterion has been computed}
+
+   sqr(a)=a*a
+   sqrt(a)=square root of a
+

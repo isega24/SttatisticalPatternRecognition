@@ -16,7 +16,6 @@ vector < double > operator *(const vector<double> &p1,const vector<double> &p2);
 vector < double > operator *(const double &p1,const vector<double> &p2);
 vector < double > operator /(const vector<double> &p1,const vector<double> &p2);
 vector < double > operator /(const vector<double> &p1,const double &p2);
-vector < double > norma(const vector<double> &p1,const double &p2);
 double scalarProduct(const vector<double> &p1,const vector<double> &p2);
 double discriminantKNN(const vector < double > & cases, const vector < double > &trainPoint);
 double distance(vector < double > a, vector < double > b);
@@ -33,8 +32,9 @@ private:
     vector < double > maxMinValues;
     vector < double > gravityPoint(int clas)const;
     void normalizeData();
-    vector < double > meanValue()const;
-    vector < double > desviationValue()const;
+    int nClasses, nFeatures;
+    vector < double > meanValues()const;
+    vector < double > desviationValues()const;
     void normalizeDiscriminant(int clas);
     double minDistToSameClassObject(int idObject, int idClass);
     double minDistToOtherClass(int idObject, int idClass);
@@ -44,7 +44,7 @@ private:
 
     int calcNP(int idClass, int idObject);
 public:
-    Classifier(vector < vector < vector <double> > > & data);
+    Classifier(const vector < vector < vector <double> > > & data);
     void showGravityCenter(int clas)const;
     void showGravityCenterStandard(int clas)const;
     void showWeights(int clas)const;
@@ -114,15 +114,6 @@ vector < double > operator /(const vector<double> &p1,const double &p2){
     return result;
 }
 
-vector < double > norma(const vector<double> &p1,const double &p2){
-    vector<double> result;
-    for(int i = 0; i < p1.size(); i++){
-        result.push_back(p1[i]/p2);
-    }
-
-    return result;
-}
-
 double scalarProduct(const vector<double> &p1,const vector<double> &p2){
     double result = 0;
     for(int i = 0; i < p1.size(); i++){
@@ -150,7 +141,7 @@ vector < double > Classifier::gravityPoint(int clas)const{
 }
 
 void Classifier::normalizeData(){
-    vector < double > meane = meanValue(), desv = desviationValue();
+    vector < double > meane = meanValues(), desv = desviationValues();
     for( int i = 0; i < data.size(); i++){
         for( int j = 0; j < data[i].size(); j++){
             normalData[i][j] = (data[i][j]-meane)/desv;
@@ -159,9 +150,10 @@ void Classifier::normalizeData(){
         this->omegaValues[i] =2*this->normalizeClassesGravityPoints[i];
         this->omegaValue[i] = -scalarProduct(this->normalizeClassesGravityPoints[i],this->normalizeClassesGravityPoints[i]);
     }
+    for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
 }
-vector < double > Classifier::meanValue()const{
-    vector<double> firstMoment(this->data[0][0].size());
+vector < double > Classifier::meanValues()const{
+    vector<double> firstMoment(this->nFeatures);
     int values = 0;
     for( int i = 0; i < data.size(); i++){
         values += data[i].size();
@@ -172,8 +164,8 @@ vector < double > Classifier::meanValue()const{
     return firstMoment/(1.0*values);
 }
 
-vector < double > Classifier::desviationValue()const{
-    vector<double> secondMoment(this->data[0][0].size());
+vector < double > Classifier::desviationValues()const{
+    vector<double> secondMoment(this->nFeatures);
     int values = 0;
     for( int i = 0; i < data.size(); i++){
         values += data[i].size();
@@ -182,23 +174,19 @@ vector < double > Classifier::desviationValue()const{
         }
     }
     secondMoment = secondMoment/(1.0*values);
-    vector < double > meane = this->meanValue()*this->meanValue();
+    vector < double > meanValus = this->meanValues();
+    vector < double > meane = meanValus*meanValus;
 
     vector<double> desviation = secondMoment - meane;
     for(int i = 0; i < desviation.size(); i++){
-        if(desviation[i] < 0){
-            desviation[i] = 0;
-        }
-        else{
-            desviation[i] = sqrt(desviation[i]);
-        }
+        desviation[i] = sqrt(desviation[i]);
     }
     return desviation;
 }
 
 void Classifier::normalizeDiscriminant(int clas){
-    vector < double > desv = this->desviationValue();
-    vector < double > mean = this->meanValue();
+    vector < double > desv = this->desviationValues();
+    vector < double > mean = this->meanValues();
     this->omegaValuesStandard[clas] = 2*normalizeClassesGravityPoints[clas]/desv;
     this->omegaValueStandard[clas] = -2*scalarProduct(normalizeClassesGravityPoints[clas],mean/desv)-
         scalarProduct(normalizeClassesGravityPoints[clas],normalizeClassesGravityPoints[clas]);
@@ -208,26 +196,26 @@ double Classifier::discriminant (vector < double > cases , int clas)const{
 }
 
 
-Classifier::Classifier(vector < vector < vector <double> > > & data){
-    this->data = data;
-    this->normalData = this->data;
+Classifier::Classifier(const vector < vector < vector <double> > > & data){
+    this->normalData = this->data = data;
+    this->nClasses = this->data.size();
+    this->nFeatures = this->data[0][0].size();
     for( int i = 0; i < data.size(); i++){
         vector < double > gPoint = this->gravityPoint(i);
         this->classesGravityPoints.push_back(gPoint);
     }
 
-    this->omegaValue = vector<double>(this->data[0][0].size());
-    this->omegaValues = vector< vector < double > >( this->data[0][0].size());
-    this->omegaValueStandard = vector<double>(this->data[0][0].size());
-    this->omegaValuesStandard = vector< vector < double > >(this->data.size());
-    this->normalizeClassesGravityPoints = vector< vector < double > >(this->data.size());
-    for(int i = 0; i < this->data.size(); i++){
-        this->omegaValues[i] = vector < double >(this->data[0][0].size());
-        this->omegaValuesStandard[i] = vector< double >(this->data[0][0].size());
+    this->omegaValue = vector<double>(this->nFeatures);
+    this->omegaValues = vector< vector < double > >( this->nClasses);
+    this->omegaValueStandard = vector<double>(this->nFeatures);
+    this->omegaValuesStandard = vector< vector < double > >(nClasses);
+    this->normalizeClassesGravityPoints = vector< vector < double > >(nClasses);
+    for(int i = 0; i < nClasses; i++){
+        this->omegaValues[i] = vector < double >(this->nFeatures,0);
+        this->omegaValuesStandard[i] = vector< double >(this->nFeatures,0);
         this->normalizeClassesGravityPoints[i] = vector< double >(this->data[0][0]);
     }
     this->normalizeData();
-    for(int i= 0; i < data.size(); i++) this->normalizeDiscriminant(i);
     this->setMaxMinDist();
 
 }
@@ -286,7 +274,7 @@ void Classifier::showWeightsStandard(int clas)const{
 }
 
 int Classifier::clasifieKNN(int k, const vector<double> cases)const{
-    vector < double > casesNormalize = (cases - this->meanValue())/this->desviationValue();
+    vector < double > casesNormalize = (cases - this->meanValues())/this->desviationValues();
     vector < pair< vector < double >, int > > data;
     for( int i = 0; i < normalData.size(); i++){
         for(int j = 0; j < normalData[i].size(); j++){
@@ -490,7 +478,7 @@ vector < pair < vector < double >, int > > Classifier::reduceHartModification(co
         }
     }
     sort(orderedData.begin(), orderedData.end(),
-        []( pair < vector< double >, pair < int, int > > a, pair < vector<double>, pair < int, int > > b) {
+        []( const pair < vector< double >, pair < int, int > > &a, const pair < vector<double>, pair < int, int > > &b) {
             return a.second.second < b.second.second;
         }
     );

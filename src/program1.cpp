@@ -23,7 +23,7 @@ int main(int argc, char const *argv[]) {
     trF >> classes >> features >> cases;
 
     dataClasses = vector < vector < vector < double > > >(classes);
-
+    
     double input ;
     int clas;
     for( int i = 0; i < cases; i++){

@@ -1,8 +1,7 @@
- File to be reduced: Train.txt
+ File to be reduced: Fortest.txt
 
- nz,lre = 37  1
- nz,lre = 53  2
- nz,lre = 58  3
- nz,lre = 58  4
- nz = 58
+ nz,lre =  2  1
+ nz,lre =  3  2
+ nz,lre =  3  3
+ nz =  3
 
